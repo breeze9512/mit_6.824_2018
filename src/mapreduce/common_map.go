@@ -1,10 +1,10 @@
 package mapreduce
 
 import (
-	"hash/fnv"
-	"fmt"
-	"io/ioutil"
 	"encoding/json"
+	"fmt"
+	"hash/fnv"
+	"io/ioutil"
 	"os"
 )
 
@@ -15,8 +15,8 @@ func doMap(
 	nReduce int, // the number of reduce task that will be run ("R" in the paper)
 	mapF func(filename string, contents string) []KeyValue,
 ) {
-	fmt.Println("job name:%s, map task id:%d, input file name:%s, reduce task number:%d\n", 
-				jobName, mapTask, inFile, nReduce);
+	fmt.Printf("job name:%s, map task id:%d, input file name:%s, reduce task number:%d\n",
+		jobName, mapTask, inFile, nReduce)
 	//
 	// doMap manages one map task: it should read one of the input files
 	// (inFile), call the user-defined map function (mapF) for that file's
@@ -29,7 +29,7 @@ func doMap(
 	// below) on each key, mod nReduce, to pick r for a key/value pair.
 	bytes, err := ioutil.ReadFile(inFile)
 	if err != nil {
-		fmt.Println("unable to read file:%s", inFile)
+		fmt.Printf("unable to read file:%s", inFile)
 	}
 
 	contents := string(bytes)
@@ -51,21 +51,21 @@ func doMap(
 	// character you can think of.
 	//
 	encoders := make([]*json.Encoder, nReduce)
-	for i:=0; i<nReduce; i++ {
+	for i := 0; i < nReduce; i++ {
 		reduce_file := reduceName(jobName, mapTask, i)
-		reduce_file_fd,err := os.Create(reduce_file)
+		reduce_file_fd, err := os.Create(reduce_file)
 		if err != nil {
-			fmt.Println("create reduce file:%s failed", reduce_file)
+			fmt.Printf("create reduce file:%s failed", reduce_file)
 		}
 		defer reduce_file_fd.Close()
 		encoders[i] = json.NewEncoder(reduce_file_fd)
 	}
 
-	for _,kv := range kvs {
+	for _, kv := range kvs {
 		reduce_index := ihash(kv.Key) % nReduce
 		err := encoders[reduce_index].Encode(&kv)
 		if err != nil {
-			fmt.Println("encoder%d encode kv(key:%s, value:%s) fail", reduce_index, kv.Key, kv.Value)
+			fmt.Printf("encoder%d encode kv(key:%s, value:%s) fail", reduce_index, kv.Key, kv.Value)
 		}
 	}
 	// One format often used for serializing data to a byte stream that the

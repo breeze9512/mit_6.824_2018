@@ -1,20 +1,20 @@
 package mapreduce
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"io"
 	"os"
 	"sort"
-	"io"
 )
 
 type ByKey []KeyValue
 
-func(this ByKey) Len() int {
+func (this ByKey) Len() int {
 	return len(this)
 }
 
-func(this ByKey) Less(i, j int) bool {
+func (this ByKey) Less(i, j int) bool {
 	return this[i].Key < this[j].Key
 }
 
@@ -37,11 +37,11 @@ func doReduce(
 	//
 
 	var kvs []KeyValue
-	for i:=0; i<nMap; i++ {
+	for i := 0; i < nMap; i++ {
 		reduce_file := reduceName(jobName, i, reduceTask)
-		reduce_file_fd,err := os.Open(reduce_file)
+		reduce_file_fd, err := os.Open(reduce_file)
 		if err != nil {
-			fmt.Println("open reduce file:%s failed", reduce_file)
+			fmt.Printf("open reduce file:%s failed", reduce_file)
 		}
 		decoder := json.NewDecoder(reduce_file_fd)
 		for {
@@ -49,7 +49,7 @@ func doReduce(
 			if err := decoder.Decode(&kv); err == io.EOF {
 				break
 			} else if err != nil {
-				fmt.Println("decode failed, file name: %s", reduce_file)
+				fmt.Printf("decode failed, file name: %s", reduce_file)
 				reduce_file_fd.Close()
 				return
 			}
@@ -60,9 +60,9 @@ func doReduce(
 
 	sort.Sort(ByKey(kvs))
 
-	output_file_fd,err := os.Create(outFile)
+	output_file_fd, err := os.Create(outFile)
 	if err != nil {
-		fmt.Println("error while creating out file: %s", outFile)
+		fmt.Printf("error while creating out file: %s", outFile)
 	}
 	defer output_file_fd.Close()
 
@@ -75,7 +75,7 @@ func doReduce(
 	key := kvs[0].Key
 	var values []string
 	values = append(values, kvs[0].Value)
-	for i:=1; i<kvs_len; i++ {
+	for i := 1; i < kvs_len; i++ {
 		if key != kvs[i].Key {
 			values = append(values, kvs[i].Value)
 			enc.Encode(KeyValue{key, reduceF(key, values)})

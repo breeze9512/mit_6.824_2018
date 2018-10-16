@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"mapreduce"
 	"os"
+	"strconv"
 	"strings"
 	"unicode"
-	"strconv"
 )
 
 //
@@ -19,21 +19,21 @@ import (
 func mapF(filename string, contents string) []mapreduce.KeyValue {
 	// Your code here (Part II).
 	words := strings.FieldsFunc(contents, func(r rune) bool {
-        return !unicode.IsLetter(r)
-    })
-    var kvs []mapreduce.KeyValue
-    // one word is representing 1 time
-    for _, word := range words {
-    	tmp := -1
-    	for i, kv := range kvs {
-    		if kv.Key == word {
-    			tmp = i
-    			break
-    		}
+		return !unicode.IsLetter(r)
+	})
+	var kvs []mapreduce.KeyValue
+	// one word is representing 1 time
+	for _, word := range words {
+		tmp := -1
+		for i, kv := range kvs {
+			if kv.Key == word {
+				tmp = i
+				break
+			}
 		}
 
 		if tmp >= 0 {
-			cnt,err := strconv.Atoi(kvs[tmp].Value)
+			cnt, err := strconv.Atoi(kvs[tmp].Value)
 			if err != nil {
 				fmt.Printf("map atoi err, string is : %s", kvs[tmp].Value)
 				cnt = 0
@@ -43,8 +43,8 @@ func mapF(filename string, contents string) []mapreduce.KeyValue {
 			kvs = append(kvs, mapreduce.KeyValue{Key: word, Value: "1"})
 		}
 		//kvs = append(kvs, mapreduce.KeyValue{Key: word, Value: "1"})
-    }
-    return kvs
+	}
+	return kvs
 }
 
 //
@@ -55,8 +55,8 @@ func mapF(filename string, contents string) []mapreduce.KeyValue {
 func reduceF(key string, values []string) string {
 	// Your code here (Part II).
 	res := 0
-	for _,value := range values {
-		tmp,err := strconv.Atoi(value)
+	for _, value := range values {
+		tmp, err := strconv.Atoi(value)
 		if err != nil {
 			fmt.Printf("reduce atoi err, string is : %s", value)
 			tmp = 0
