@@ -34,6 +34,7 @@ func doMap(
 
 	contents := string(bytes)
 	kvs := mapF(inFile, contents)
+
 	//
 	// mapF() is the map function provided by the application. The first
 	// argument should be the input file name, though the map function
