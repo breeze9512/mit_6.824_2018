@@ -83,6 +83,7 @@ func doReduce(
 		}
 		values = append(values, kvs[i].Value)
 	}
+	enc.Encode(KeyValue{key, reduceF(key, values)})
 	return
 
 	// You'll need to read one intermediate file from each map task;

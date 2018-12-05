@@ -30,5 +30,8 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 	//
 	// Your code here (Part III, Part IV).
 	//
+
+	/* get workers from channel */
+	
 	fmt.Printf("Schedule: %v done\n", phase)
 }
