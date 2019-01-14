@@ -36,7 +36,6 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 
 			var args DoTaskArgs
 
-			worker := <-registerChan
 			args.JobName = jobName
 			if phase == mapPhase {
 				args.File = mapFiles[task]
@@ -46,7 +45,9 @@ func schedule(jobName string, mapFiles []string, nReduce int, phase jobPhase, re
 			args.NumOtherPhase = otherPhase
 			reply := ShutdownReply{0}
 			for {
-				if call(worker, "Worker.DoTask", &args, &reply) {
+				worker := <-registerChan
+				ok := call(worker, "Worker.DoTask", &args, &reply)
+				if ok {
 					//fmt.Printf("worker %v ok, phase:%s", i, phase)
 					go func() { registerChan <- worker } ()
 					break
